@@ -59,7 +59,7 @@ func (app *Config) writeJSON(w http.ResponseWriter, status int, data any, header
 
 	// write the data out
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(status)
 	_, err = w.Write(out)
 	if err != nil {
 		return err
