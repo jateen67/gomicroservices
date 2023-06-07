@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// start our server
-	log.Println("starting server on port", port)
+	log.Printf("starting logger service on port %s\n", port)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
 		Handler: app.routes(),

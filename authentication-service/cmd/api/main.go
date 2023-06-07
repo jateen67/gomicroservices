@@ -37,7 +37,7 @@ func main() {
 		Models: data.New(conn),
 	}
 
-	log.Println("starting auth service")
+	log.Printf("starting auth service on port %s\n", port)
 
 	// define http server with stuff like the port number and the routes we will use
 	srv := &http.Server{
