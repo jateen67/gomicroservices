@@ -1,11 +1,5 @@
 # Distributed System
 
-The purpose of this project was to practice building scalable apps using microservice architecture.
+The purpose of this project was to build a scalable application using microservice architecture.
 
-This website...
-
-Tech used: Go, Bootstrap, Docker
-
-## Practiced:
-
-To be continued...
+Tech used: Go, PostgreSQL, MongoDB, Bootstrap, Docker
