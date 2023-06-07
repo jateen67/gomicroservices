@@ -24,5 +24,8 @@ func (app *Config) routes() http.Handler {
 	// easily make sure that the service is running by hitting the endpoint to get a response
 	mux.Use(middleware.Heartbeat("/ping"))
 
+	// post request to localhost:80/send will run the SendMail method (will be mapped to 8080 through docker)
+	mux.Post("/send", app.SendMail)
+
 	return mux
 }

@@ -25,7 +25,7 @@ func (app *Config) routes() http.Handler {
 	mux.Use(middleware.Heartbeat("/ping"))
 
 	// add routes that use handlers, which will be called when we access these routes
-	// post request to localhost:80 will run the WriteLog method (will be mapped to 8080 through docker)
+	// post request to localhost:80/log will run the WriteLog method (will be mapped to 8080 through docker)
 	mux.Post("/log", app.WriteLog)
 
 	return mux
