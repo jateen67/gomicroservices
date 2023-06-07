@@ -4,3 +4,4 @@ front-end/frontApp.exe
 authentication-service/authApp
 project/db-data
 logger-service/loggerServiceApp
+mail-service/mailerApp
