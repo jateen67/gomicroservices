@@ -11,12 +11,19 @@ import (
 type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
+	Log    LogPayload  `json:"log,omitempty"`
 }
 
 // format of the json in our auth service's 'Authenticate' method
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+// format of the json in our auth service's 'WriteLog' method
+type LogPayload struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 // method that will be called when we send a post request to "localhost:80/" (will be mapped to 8080 through docker)
@@ -47,6 +54,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
+	case "log":
+		app.logItem(w, requestPayload.Log)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
@@ -108,6 +117,43 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	payload.Error = false
 	payload.Message = "authenticated"
 	payload.Data = jsonFromService.Data // as defined in the auth-service's Authenticate function, this will be our User
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
+	// create json that well send to the log microservice by encoding the name/data json we receive ('entry')
+	jsonData, _ := json.MarshalIndent(entry, "", "\t")
+
+	// prepare service to send a post request to the /log endpoint defined in the logger-service routes.go file
+	// we will prepare the recently encoded jsonData with the name/data as a request body
+	request, err := http.NewRequest("POST", "http://logger-service/log", bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	// we will actually send the request now and get the response from the auth service
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer res.Body.Close()
+
+	// make sure we get the correct status code from the logg service
+	if res.StatusCode != http.StatusAccepted {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// after all these checks, we know that we have a valid log, so we send back the user a payload with good info
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged"
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }

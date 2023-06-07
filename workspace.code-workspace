@@ -16,5 +16,7 @@
       "path": "logger-service"
     }
   ],
-  "settings": {}
+  "settings": {
+    "discord.enabled": true
+  }
 }
