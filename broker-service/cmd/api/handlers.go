@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/jateen67/broker/event"
 )
 
 // agreed upon json format that all our microservices will adhere to. doesnt matter what were sending from our various services
@@ -64,7 +66,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		app.logItem(w, requestPayload.Log)
+		app.logEventViaRabbitMQ(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -204,4 +206,43 @@ func (app *Config) sendMail(w http.ResponseWriter, msg MailPayload) {
 	payload.Message = "message sent to " + msg.To
 
 	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// function to handle logging an item by emitting an event to rabbitmq
+func (app *Config) logEventViaRabbitMQ(w http.ResponseWriter, l LogPayload) {
+	err := app.pushToQueue(l.Name, l.Data)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// if error is passed then we send back json response
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged via rabbitmq"
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// utility function that will be used every time we need to push something to the queue
+func (app *Config) pushToQueue(name, msg string) error {
+	// get emitter
+	emitter, err := event.NewEventEmitter(app.Rabbit)
+	if err != nil {
+		return err
+	}
+
+	// payload to push to queue
+	payload := LogPayload{
+		Name: name,
+		Data: msg,
+	}
+
+	// encode payload so we can push json to queue
+	j, _ := json.MarshalIndent(&payload, "", "\t")
+	err = emitter.Push(string(j), "log.INFO")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
