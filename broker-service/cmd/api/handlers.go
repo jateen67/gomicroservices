@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/rpc"
 
 	"github.com/jateen67/broker/event"
 )
@@ -37,6 +38,11 @@ type MailPayload struct {
 	Message string `json:"message"`
 }
 
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
 // method that will be called when we send a post request to "localhost:80/" (will be mapped to 8080 through docker)
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	// jsonResponse comes from helpers.go
@@ -66,7 +72,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		app.logEventViaRabbitMQ(w, requestPayload.Log)
+		app.logItemViaRPC(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -245,4 +251,35 @@ func (app *Config) pushToQueue(name, msg string) error {
 	}
 
 	return nil
+}
+
+func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
+	// create an rpc client
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// now we need to create some kind of payload
+	// create a type that exactly matches the one that the rpc server expects to get
+	rpcPayload := RPCPayload{
+		Name: l.Name,
+		Data: l.Data,
+	}
+
+	// get some kind of result back
+	var result string
+	// call the method (created in logger-service rpc.go file) with the payload and get back the result (also from the method)
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// if error is passed then we send back json response
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = result
+	app.writeJSON(w, http.StatusAccepted, payload)
 }

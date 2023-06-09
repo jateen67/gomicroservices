@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/rpc"
 	"time"
 
 	"github.com/jateen67/log-service/data"
@@ -49,6 +51,11 @@ func main() {
 		Models: data.New(client),
 	}
 
+	// register the rpc server to tell the app that we will indeed be accepting rpc requests
+	err = rpc.Register(new(RPCServer))
+	// start our rpc server
+	go app.rpcListen()
+
 	// start our server
 	log.Printf("starting logger service on port %s\n", port)
 	srv := &http.Server{
@@ -62,16 +69,23 @@ func main() {
 	}
 }
 
-func (app *Config) serve() {
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
-		Handler: app.routes(),
-	}
-
-	// start server
-	err := srv.ListenAndServe()
+// method to start up rpc server
+func (app *Config) rpcListen() error {
+	log.Println("starting rpc server on port ", rpcPort)
+	// listen for a tcp connection on any and all ip addresses (0.0.0.0) and our rpcPort
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", rpcPort))
 	if err != nil {
-		log.Panic()
+		return err
+	}
+	defer listen.Close()
+
+	// loop that executes forever to accept connections
+	for {
+		rpcConn, err := listen.Accept()
+		if err != nil {
+			continue
+		}
+		go rpc.ServeConn(rpcConn)
 	}
 }
 
