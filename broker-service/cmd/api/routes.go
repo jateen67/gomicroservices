@@ -28,6 +28,10 @@ func (app *Config) routes() http.Handler {
 	// add routes that use handlers, which will be called when we access these routes
 	// post request to localhost:80 will run the Broker method (will be mapped to 8080 through docker)
 	mux.Post("/", app.Broker)
+
+	// grpc route just for ease of reference
+	mux.Post("/log-grpc", app.LogItemViaGRPC)
+
 	// a single point of entry that will handle all requests from all other microservices
 	mux.Post("/handle", app.HandleSubmission)
 

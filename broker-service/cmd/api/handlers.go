@@ -2,12 +2,17 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/rpc"
+	"time"
 
 	"github.com/jateen67/broker/event"
+	"github.com/jateen67/broker/logs"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // agreed upon json format that all our microservices will adhere to. doesnt matter what were sending from our various services
@@ -281,5 +286,44 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	var payload jsonResponse
 	payload.Error = false
 	payload.Message = result
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) LogItemViaGRPC(w http.ResponseWriter, r *http.Request) {
+	var requestPayload RequestPayload
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer conn.Close()
+
+	// create client
+	c := logs.NewLogServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, err = c.WriteLog(ctx, &logs.LogRequest{
+		LogEntry: &logs.Log{
+			Name: requestPayload.Log.Name,
+			Data: requestPayload.Log.Data,
+		},
+	})
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// if error is passed then we send back json response
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged via grpc"
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
