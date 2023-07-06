@@ -1,9 +1,6 @@
 {
   "folders": [
     {
-      "path": "front-end"
-    },
-    {
       "path": "broker-service"
     },
     {
@@ -20,6 +17,9 @@
     },
     {
       "path": "listener-service"
+    },
+    {
+      "path": "client"
     }
   ],
   "settings": {
