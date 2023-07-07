@@ -4,6 +4,7 @@ export default function TestArea() {
   const [sent, setSent] = useState<string>("Nothing sent yet...");
   const [received, setReceived] = useState<string>("Nothing received yet...");
   const [outputs, setOutputs] = useState<string[][]>([]);
+  const [output, setOutput] = useState<string>("Output shows here...");
 
   function TestBroker() {
     const body = {
@@ -222,18 +223,18 @@ export default function TestArea() {
             Test Auth
           </a>
           <a
-            id="logBtn"
-            className="btn btn-outline-secondary"
-            onClick={TestRabbitMQLogger}
-          >
-            Test RabbitMQ Logger
-          </a>
-          <a
             id="logGBtn"
             className="btn btn-outline-secondary"
             onClick={TestGRPCLogger}
           >
             Test gRPC Logger
+          </a>
+          <a
+            id="logBtn"
+            className="btn btn-outline-secondary"
+            onClick={TestRabbitMQLogger}
+          >
+            Test RabbitMQ Logger
           </a>
           <a
             id="mailBtn"
