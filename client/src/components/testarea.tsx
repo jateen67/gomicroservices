@@ -13,14 +13,14 @@ export default function TestArea() {
     fetch("http://localhost:8080", body)
       .then((response) => response.json())
       .then((data) => {
-        setSent("empty post request");
+        setSent("Empty post request");
         setReceived(JSON.stringify(data, undefined, 4));
         if (data.error) {
-          setOutputs([...outputs, ["Error from broker service", data.message]]);
+          setOutputs([...outputs, ["Error from Broker service", data.message]]);
         } else {
           setOutputs([
             ...outputs,
-            ["Response from broker service", data.message],
+            ["Response from Broker service", data.message],
           ]);
         }
       })
@@ -28,7 +28,7 @@ export default function TestArea() {
         console.log(err);
         setOutputs([
           ...outputs,
-          ["Error fetching from broker service", err.message],
+          ["Error fetching from Broker service", err.message],
         ]);
       });
   }
@@ -57,28 +57,28 @@ export default function TestArea() {
         setSent(JSON.stringify(payload, undefined, 4));
         setReceived(JSON.stringify(data, undefined, 4));
         if (data.error) {
-          setOutputs([...outputs, ["Error from auth service", data.message]]);
+          setOutputs([...outputs, ["Error from Auth service", data.message]]);
         } else {
           setOutputs([
             ...outputs,
-            ["Response from auth service", data.message],
+            ["Response from Auth service", data.message],
           ]);
         }
       })
       .catch((err) => {
         setOutputs([
           ...outputs,
-          ["Error fetching from auth service", err.message],
+          ["Error fetching from Auth service", err.message],
         ]);
       });
   }
 
-  function TestRPCLogger() {
+  function TestRabbitMQLogger() {
     const payload = {
       action: "log",
       log: {
-        name: "RPC event",
-        data: "Some kind of RPC data",
+        name: "RabbitMQ event",
+        data: "Some kind of RabbitMQ data",
       },
     };
 
@@ -99,19 +99,19 @@ export default function TestArea() {
         if (data.error) {
           setOutputs([
             ...outputs,
-            ["Error from RPC logger service", data.message],
+            ["Error from RPC Logger service", data.message],
           ]);
         } else {
           setOutputs([
             ...outputs,
-            ["Response from RPC logger service", data.message],
+            ["Response from RPC Logger service", data.message],
           ]);
         }
       })
       .catch((err) => {
         setOutputs([
           ...outputs,
-          ["Error fetching from RPC logger service", err.message],
+          ["Error fetching from RPC Logger service", err.message],
         ]);
       });
   }
@@ -142,19 +142,19 @@ export default function TestArea() {
         if (data.error) {
           setOutputs([
             ...outputs,
-            ["Error from gRPC logger service", data.message],
+            ["Error from gRPC Logger service", data.message],
           ]);
         } else {
           setOutputs([
             ...outputs,
-            ["Response from gRPC logger service", data.message],
+            ["Response from gRPC Logger service", data.message],
           ]);
         }
       })
       .catch((err) => {
         setOutputs([
           ...outputs,
-          ["Error fetching from gRPC logger service", err.message],
+          ["Error fetching from gRPC Logger service", err.message],
         ]);
       });
   }
@@ -185,18 +185,18 @@ export default function TestArea() {
         setSent(JSON.stringify(payload, undefined, 4));
         setReceived(JSON.stringify(data, undefined, 4));
         if (data.error) {
-          setOutputs([...outputs, ["Error from mailer service", data.message]]);
+          setOutputs([...outputs, ["Error from Mailer service", data.message]]);
         } else {
           setOutputs([
             ...outputs,
-            ["Response from mailer service", data.message],
+            ["Response from Mailer service", data.message],
           ]);
         }
       })
       .catch((err) => {
         setOutputs([
           ...outputs,
-          ["Error fetching from mailer service", err.message],
+          ["Error fetching from Mailer service", err.message],
         ]);
       });
   }
@@ -224,9 +224,9 @@ export default function TestArea() {
           <a
             id="logBtn"
             className="btn btn-outline-secondary"
-            onClick={TestRPCLogger}
+            onClick={TestRabbitMQLogger}
           >
-            Test RPC Logger
+            Test RabbitMQ Logger
           </a>
           <a
             id="logGBtn"

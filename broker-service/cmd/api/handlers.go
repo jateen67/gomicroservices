@@ -53,7 +53,7 @@ func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	// jsonResponse comes from helpers.go
 	payload := jsonResponse{
 		Error:   false,
-		Message: "hit the broker",
+		Message: "Hit the broker!",
 	}
 
 	// write the data out using the writeJSON method defined in helpers.go
@@ -77,7 +77,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		app.logItemViaRPC(w, requestPayload.Log)
+		app.logEventViaRabbitMQ(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -109,7 +109,7 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 
 	// make sure we get the correct status code from the auth service
 	if res.StatusCode == http.StatusUnauthorized {
-		app.errorJSON(w, errors.New("invalid credentials"))
+		app.errorJSON(w, errors.New("nvalid credentials"))
 		return
 	} else if res.StatusCode != http.StatusAccepted {
 		app.errorJSON(w, errors.New("error calling auth service"))
@@ -139,12 +139,13 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	// after all these checks, we know that we have a valid login, so we send back the user a payload with good info
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "authenticated"
+	payload.Message = "Authenticated!"
 	payload.Data = jsonFromService.Data // as defined in the auth-service's Authenticate function, this will be our User
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
+// log item via json
 func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	// create json that well send to the log microservice by encoding the name/data json we receive ('entry')
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
@@ -177,7 +178,7 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	// after all these checks, we know that we have a valid log, so we send back the user a payload with good info
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "logged"
+	payload.Message = "Logged!"
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
@@ -214,7 +215,7 @@ func (app *Config) sendMail(w http.ResponseWriter, msg MailPayload) {
 	// after all these checks, we know that we have a valid mail send, so we send back the user a payload with good info
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "message sent to " + msg.To
+	payload.Message = "Message sent to " + msg.To + "!"
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
@@ -230,7 +231,7 @@ func (app *Config) logEventViaRabbitMQ(w http.ResponseWriter, l LogPayload) {
 	// if error is passed then we send back json response
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "logged via rabbitmq"
+	payload.Message = "Logged via RabbitMQ!"
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
@@ -324,6 +325,6 @@ func (app *Config) LogItemViaGRPC(w http.ResponseWriter, r *http.Request) {
 	// if error is passed then we send back json response
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "logged via grpc"
+	payload.Message = "Logged via gRPC!"
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
