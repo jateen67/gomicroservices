@@ -1,6 +1,6 @@
 # Distributed System
 
-[gif]
+![0-tourcropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/977db707-20b1-4ecb-a0b2-bd1042f838b5)
 
 The purpose of this project was to build a scalable application using microservice architecture.
 
