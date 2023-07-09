@@ -38,7 +38,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// log authentication to logger-service
-	err = app.logRequest("authentication", fmt.Sprintf("%s logged in", user.Email))
+	err = app.logRequest("Authentication Event", fmt.Sprintf("%s logged in", user.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
