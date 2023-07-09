@@ -35,7 +35,7 @@ Microservices have a wide variety of benefits:
 
 This project is divided into 5 (6 if you count the front-end) services. They are all accessed through the Broker service, which acts as a centralized point of contact. 
 
-Below is a picture of the architecture of this application.
+Below is a picture of the overall architecture of this application.
 
 ![wwww](https://github.com/jateen67/albumdbcsharp/assets/106696411/08d2ae9d-f7c0-4006-9bad-c241ea5a3838)
 
