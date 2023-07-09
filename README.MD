@@ -47,7 +47,7 @@ This serves as a main point of entry into the microservice cluster. It is option
 
 When a user sends a request to a certain microservice, the request goes to the Broker service first, which in turn will communicate and send its own request to that specific service, and finally return the response to the client.
 
-[gif]
+![1-brokercropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/8fe8669a-2b40-4e36-9c03-065e3a5a8279)
 
 **Logger Service**
 
@@ -57,7 +57,7 @@ When the user sends a request to the Logger Service through the Broker Service, 
 
 The database containing the successful user activity logs can be accessed locally using a Mongo client like [MongoDBCompass](https://www.mongodb.com/products/compass) (Connection String: mongodb://admin:password@localhost:27017/logs?authSource=admin&readPreference=primary&directConnection=true&ssl=false)
 
-[gif]
+![3-grpccropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/cf077641-8fa7-47e0-b4f2-92a8baf4ec1e)
 
 **Authentication Service**
 
@@ -71,7 +71,7 @@ The database containing the user credentials can be accessed locally using a lig
 
 The database containing the successful user login logs, alongside the other successful activity logs, can be accessed locally using a Mongo client like [MongoDBCompass](https://www.mongodb.com/products/compass) (Connection String: mongodb://admin:password@localhost:27017/logs?authSource=admin&readPreference=primary&directConnection=true&ssl=false)
 
-[gif]
+![2-authcropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/60fc90e4-8f7b-4ae0-bad3-33bc8b56724a)
 
 **Listener Service**
 
@@ -83,7 +83,7 @@ This works by first pushing an event to the RabbitMQ server from the Broker Serv
 
 The database containing the successful user activity logs via RabbitMQ can be accessed locally using a Mongo client like [MongoDBCompass](https://www.mongodb.com/products/compass) (Connection String: mongodb://admin:password@localhost:27017/logs?authSource=admin&readPreference=primary&directConnection=true&ssl=false)
 
-[gif]
+![4-rabbitcropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/a62e37fa-cfb0-4cdb-a3a8-31233f955b1b)
 
 **Mail Service**
 
@@ -91,7 +91,7 @@ This is an email service that allows the user to send an email out with MailHog.
 
 Sent emails can be viewed by accessing the MailHog UI on `localhost:8025`
 
-[gif]
+![5-mailercropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/4dfa002a-b609-436f-bdf1-8b3d5ff125ed)
 
 ### Technologies
 
