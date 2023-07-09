@@ -33,7 +33,7 @@ Microservices have a wide variety of benefits:
 
 ### Services
 
-[architecture picture]
+![wwww](https://github.com/jateen67/albumdbcsharp/assets/106696411/24359e56-908c-4ff4-80fa-39909b92b915)
 
 **Front-end Service**
 
