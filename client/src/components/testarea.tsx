@@ -4,34 +4,57 @@ export default function TestArea() {
   const [sent, setSent] = useState<string>("Nothing sent yet...");
   const [received, setReceived] = useState<string>("Nothing received yet...");
   const [outputs, setOutputs] = useState<string[][]>([]);
-  const [output, setOutput] = useState<string>("Output shows here...");
 
-  function TestBroker() {
+  function fetchData(url: string, payload: object, serviceName: string) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
     const body = {
       method: "POST",
+      body: JSON.stringify(payload),
+      headers: headers,
     };
 
-    fetch("http://localhost:8080", body)
+    fetch(url, body)
       .then((response) => response.json())
       .then((data) => {
-        setSent("Empty post request");
+        setSent(JSON.stringify(payload, undefined, 4));
         setReceived(JSON.stringify(data, undefined, 4));
         if (data.error) {
-          setOutputs([...outputs, ["Error from Broker service", data.message]]);
+          setOutputs([
+            [
+              `Error from ${serviceName} service`,
+              data.message,
+              new Date().toString(),
+            ],
+          ]);
         } else {
           setOutputs([
-            ...outputs,
-            ["Response from Broker service", data.message],
+            [
+              `Response from ${serviceName} service`,
+              data.message,
+              new Date().toString(),
+            ],
           ]);
         }
       })
       .catch((err) => {
-        console.log(err);
         setOutputs([
-          ...outputs,
-          ["Error fetching from Broker service", err.message],
+          [
+            `Error fetching from ${serviceName} service`,
+            err.message,
+            new Date().toString(),
+          ],
         ]);
       });
+  }
+
+  function TestBroker() {
+    const body = {
+      Content: "Empty post request",
+    };
+
+    fetchData("http://localhost:8080", body, "Broker");
   }
 
   function TestAuth() {
@@ -43,78 +66,7 @@ export default function TestArea() {
       },
     };
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    const body = {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: headers,
-    };
-
-    fetch("http://localhost:8080/handle", body)
-      .then((response) => response.json())
-      .then((data) => {
-        setSent(JSON.stringify(payload, undefined, 4));
-        setReceived(JSON.stringify(data, undefined, 4));
-        if (data.error) {
-          setOutputs([...outputs, ["Error from Auth service", data.message]]);
-        } else {
-          setOutputs([
-            ...outputs,
-            ["Response from Auth service", data.message],
-          ]);
-        }
-      })
-      .catch((err) => {
-        setOutputs([
-          ...outputs,
-          ["Error fetching from Auth service", err.message],
-        ]);
-      });
-  }
-
-  function TestRabbitMQLogger() {
-    const payload = {
-      action: "log",
-      log: {
-        name: "RabbitMQ event",
-        data: "Some kind of RabbitMQ data",
-      },
-    };
-
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    const body = {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: headers,
-    };
-
-    fetch("http://localhost:8080/handle", body)
-      .then((response) => response.json())
-      .then((data) => {
-        setSent(JSON.stringify(payload, undefined, 4));
-        setReceived(JSON.stringify(data, undefined, 4));
-        if (data.error) {
-          setOutputs([
-            ...outputs,
-            ["Error from RPC Logger service", data.message],
-          ]);
-        } else {
-          setOutputs([
-            ...outputs,
-            ["Response from RPC Logger service", data.message],
-          ]);
-        }
-      })
-      .catch((err) => {
-        setOutputs([
-          ...outputs,
-          ["Error fetching from RPC Logger service", err.message],
-        ]);
-      });
+    fetchData("http://localhost:8080/handle", payload, "Authentication");
   }
 
   function TestGRPCLogger() {
@@ -126,38 +78,19 @@ export default function TestArea() {
       },
     };
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
+    fetchData("http://localhost:8080/log-grpc", payload, "gRPC Logger");
+  }
 
-    const body = {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: headers,
+  function TestRabbitMQLogger() {
+    const payload = {
+      action: "log",
+      log: {
+        name: "RabbitMQ event",
+        data: "Some kind of RabbitMQ data",
+      },
     };
 
-    fetch("http://localhost:8080/log-grpc", body)
-      .then((response) => response.json())
-      .then((data) => {
-        setSent(JSON.stringify(payload, undefined, 4));
-        setReceived(JSON.stringify(data, undefined, 4));
-        if (data.error) {
-          setOutputs([
-            ...outputs,
-            ["Error from gRPC Logger service", data.message],
-          ]);
-        } else {
-          setOutputs([
-            ...outputs,
-            ["Response from gRPC Logger service", data.message],
-          ]);
-        }
-      })
-      .catch((err) => {
-        setOutputs([
-          ...outputs,
-          ["Error fetching from gRPC Logger service", err.message],
-        ]);
-      });
+    fetchData("http://localhost:8080/handle", payload, "RabbitMQ Logger");
   }
 
   function TestMailer() {
@@ -167,39 +100,11 @@ export default function TestArea() {
         from: "me@example.com",
         to: "you@example.com",
         subject: "Test Email Subject",
-        message: "Hello, world!",
+        message: "Hello, world! This is my email",
       },
     };
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    const body = {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: headers,
-    };
-
-    fetch("http://localhost:8080/handle", body)
-      .then((response) => response.json())
-      .then((data) => {
-        setSent(JSON.stringify(payload, undefined, 4));
-        setReceived(JSON.stringify(data, undefined, 4));
-        if (data.error) {
-          setOutputs([...outputs, ["Error from Mailer service", data.message]]);
-        } else {
-          setOutputs([
-            ...outputs,
-            ["Response from Mailer service", data.message],
-          ]);
-        }
-      })
-      .catch((err) => {
-        setOutputs([
-          ...outputs,
-          ["Error fetching from Mailer service", err.message],
-        ]);
-      });
+    fetchData("http://localhost:8080/handle", payload, "Mailer Service");
   }
 
   return (
@@ -220,7 +125,7 @@ export default function TestArea() {
             className="btn btn-outline-secondary"
             onClick={TestAuth}
           >
-            Test Auth
+            Test Authentication
           </a>
           <a
             id="logGBtn"
@@ -249,12 +154,23 @@ export default function TestArea() {
             className="mt-5"
             style={{ outline: "1px solid silver", padding: "2em" }}
           >
-            <span className="text-muted">Output shows here...</span>
+            {outputs.length === 0 ? (
+              <>
+                <span className="text-muted">Output shows here...</span>
+              </>
+            ) : (
+              <></>
+            )}
             {outputs.map((o) => {
               return (
                 <>
+                  <strong className="text-success">Started</strong>
+                  <br></br>
+                  <i>Sending request...</i>
                   <br></br>
                   <strong>{o[0]}</strong>: {o[1]}
+                  <br></br>
+                  <strong className="text-danger">Ended</strong>: {o[2]}
                 </>
               );
             })}
@@ -269,7 +185,7 @@ export default function TestArea() {
             style={{ outline: "1px solid silver", padding: "2em" }}
           >
             <pre id="payload">
-              <span className="text-muted">{sent}</span>
+              <span style={{ fontWeight: "bold" }}>{sent}</span>
             </pre>
           </div>
         </div>
@@ -280,7 +196,7 @@ export default function TestArea() {
             style={{ outline: "1px solid silver", padding: "2em" }}
           >
             <pre id="received">
-              <span className="text-muted">{received}</span>
+              <span style={{ fontWeight: "bold" }}>{received}</span>
             </pre>
           </div>
         </div>
