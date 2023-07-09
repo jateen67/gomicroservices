@@ -47,6 +47,8 @@ This serves as a main point of entry into the microservice cluster. It is option
 
 When a user sends a request to a certain microservice, the request goes to the Broker service first, which in turn will communicate and send its own request to that specific service, and finally return the response to the client.
 
+Since the Broker service's main purpose is to communicate with the other services, sending a request to it directly will give a basic response back to the user, as a simple way of indicating that it is functioning well and ready to communicate.
+
 ![1-brokercropped](https://github.com/jateen67/mlbstatsapi/assets/106696411/8fe8669a-2b40-4e36-9c03-065e3a5a8279)
 
 **Logger Service**
